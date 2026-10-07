@@ -340,6 +340,14 @@
       animation: reveal .65s cubic-bezier(.2,.7,.3,1) both;
     }
     .reading[hidden] { display: none; }
+    .readings { display: grid; gap: 10px; }
+    .readings.has-second { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .readings.has-second .reading-inner { grid-template-columns: 48px minmax(0, 1fr); gap: 10px; padding: 11px; }
+    .readings.has-second .card-seal { width: 46px; font-size: 23px; }
+    .readings.has-second .reading h2 { font-size: 22px; }
+    .readings.has-second .reading-message { font-size: 9px; }
+    .draw-another { width: 100%; margin-top: 10px; }
+    .draw-another[hidden] { display: none; }
     @keyframes reveal {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
@@ -380,6 +388,11 @@
       .wheel-stage { width: min(100%, 390px); }
       .wheel-label { transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-95px) rotate(calc(-1 * var(--label-angle))); }
       .side-panel { width: min(100%, 450px); margin: 0 auto; }
+      .readings.has-second { grid-template-columns: 1fr; }
+      .readings.has-second .reading-inner { grid-template-columns: 58px minmax(0, 1fr); gap: 13px; padding: 14px; }
+      .readings.has-second .card-seal { width: 56px; font-size: 26px; }
+      .readings.has-second .reading h2 { font-size: 27px; }
+      .readings.has-second .reading-message { font-size: 10px; }
     }
     @media (max-width: 450px) {
       .shell { width: calc(100% - 30px); }
@@ -457,16 +470,29 @@
           <p class="status" id="status" role="status" aria-live="polite">La cámara permanece apagada hasta que tú decidas activarla.</p>
           <p class="privacy">Tu imagen se procesa en este dispositivo para reconocer el movimiento de la mano. No se graba ni se envía a ningún servidor. Puedes apagar la cámara cuando quieras.</p>
 
-          <article class="reading" id="reading" aria-live="polite" hidden>
-            <div class="reading-inner">
-              <div class="card-seal" id="card-seal" aria-hidden="true">☼</div>
-              <div>
-                <p class="reading-kicker">Tu carta de hoy</p>
-                <h2 id="card-name"></h2>
-                <p class="reading-message" id="card-message"></p>
+          <div class="readings" id="readings" aria-live="polite">
+            <article class="reading" id="reading-first" hidden>
+              <div class="reading-inner">
+                <div class="card-seal" id="card-seal-first" aria-hidden="true">☼</div>
+                <div>
+                  <p class="reading-kicker">Primera carta</p>
+                  <h2 id="card-name-first"></h2>
+                  <p class="reading-message" id="card-message-first"></p>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+            <article class="reading" id="reading-second" hidden>
+              <div class="reading-inner">
+                <div class="card-seal" id="card-seal-second" aria-hidden="true">☼</div>
+                <div>
+                  <p class="reading-kicker">Segunda carta</p>
+                  <h2 id="card-name-second"></h2>
+                  <p class="reading-message" id="card-message-second"></p>
+                </div>
+              </div>
+            </article>
+          </div>
+          <button class="button button-secondary draw-another" id="draw-another" type="button" hidden>Sacar otra carta</button>
         </div>
       </section>
     </main>
@@ -505,10 +531,10 @@
     const startButton = document.querySelector("#start-camera");
     const stopButton = document.querySelector("#stop-camera");
     const status = document.querySelector("#status");
-    const reading = document.querySelector("#reading");
-    const cardName = document.querySelector("#card-name");
-    const cardMessage = document.querySelector("#card-message");
-    const cardSeal = document.querySelector("#card-seal");
+    const readings = document.querySelector("#readings");
+    const readingFirst = document.querySelector("#reading-first");
+    const readingSecond = document.querySelector("#reading-second");
+    const drawAnotherButton = document.querySelector("#draw-another");
 
     let cameraStream = null;
     let handLandmarker = null;
@@ -520,6 +546,7 @@
     let lastPalmX = null;
     let lastPalmY = null;
     let phase = "idle";
+    let selectedCards = [];
 
     cards.forEach((card, index) => {
       const label = document.createElement("span");
@@ -552,6 +579,8 @@
       startButton.disabled = false;
       startButton.innerHTML = '<span aria-hidden="true">◉</span> Activar cámara frontal';
       stopButton.hidden = true;
+      drawAnotherButton.hidden = true;
+      drawAnotherButton.disabled = false;
       palmGuide.style.setProperty("--hold-angle", "0deg");
       palmGuide.style.setProperty("--hold-visible", "0");
       palmGuide.classList.remove("is-ready");
@@ -604,16 +633,20 @@
       return handLandmarker;
     }
 
-    function showReading(index) {
+    function showReading(index, slot) {
       const card = cards[index];
-      cardName.textContent = card.name;
-      cardMessage.textContent = card.message;
-      cardSeal.textContent = card.glyph;
+      const reading = slot === 0 ? readingFirst : readingSecond;
+      document.querySelector(`#card-name-${slot === 0 ? "first" : "second"}`).textContent = card.name;
+      document.querySelector(`#card-message-${slot === 0 ? "first" : "second"}`).textContent = card.message;
+      document.querySelector(`#card-seal-${slot === 0 ? "first" : "second"}`).textContent = card.glyph;
       reading.hidden = false;
       reading.style.animation = "none";
       void reading.offsetWidth;
       reading.style.animation = "";
-      setStatus("Tu carta está aquí. Tómate un momento para leerla.");
+      readings.classList.toggle("has-second", slot === 1);
+      if (slot === 0) drawAnotherButton.hidden = false;
+      else drawAnotherButton.hidden = true;
+      setStatus(slot === 0 ? "Tu primera carta está aquí. Si quieres, puedes sacar otra." : "Tu segunda carta está aquí. Tómate un momento para leerlas.");
     }
 
     function isOpenPalm(hand) {
@@ -629,12 +662,14 @@
       return extendedFingers >= 3 && thumbSpread;
     }
 
-    function startSpin() {
-      if (phase !== "countdown") return;
-      phase = "spinning";
-      guideCountdown.hidden = true;
-      guideLabel.textContent = "Tu carta está en camino";
-      const selectedCard = Math.floor(Math.random() * cards.length);
+    function spinForCard(slot) {
+      const availableCards = cards.map((_, index) => index).filter(index => !selectedCards.includes(index));
+      if (availableCards.length === 0) {
+        drawAnotherButton.disabled = false;
+        setStatus("Ya salieron todas las cartas de esta lectura.");
+        return;
+      }
+      const selectedCard = availableCards[Math.floor(Math.random() * availableCards.length)];
       const desiredAngle = (360 - (selectedCard * 30 + 15)) % 360;
       const currentAngle = ((wheelRotation % 360) + 360) % 360;
       const alignment = (desiredAngle - currentAngle + 360) % 360;
@@ -642,14 +677,24 @@
       wheel.style.transition = "transform 3.1s cubic-bezier(.12,.7,.17,1)";
       wheelRotation = finalRotation;
       wheel.style.transform = `rotate(${wheelRotation}deg)`;
-      setStatus("La rueda gira… tu carta está por aparecer.");
+      setStatus(slot === 0 ? "La rueda gira… tu primera carta está por aparecer." : "La rueda gira… tu segunda carta está por aparecer.");
       spinTimeout = window.setTimeout(() => {
         wheel.style.transition = "none";
-        showReading(selectedCard);
+        selectedCards.push(selectedCard);
+        showReading(selectedCard, slot);
+        drawAnotherButton.disabled = false;
         phase = "done";
-        guideLabel.textContent = "Lectura revelada";
+        guideLabel.textContent = slot === 0 ? "Primera carta revelada" : "Lectura revelada";
         spinTimeout = 0;
       }, 3200);
+    }
+
+    function startSpin() {
+      if (phase !== "countdown") return;
+      phase = "spinning";
+      guideCountdown.hidden = true;
+      guideLabel.textContent = "Tu carta está en camino";
+      spinForCard(0);
     }
 
     function trackHands() {
@@ -697,7 +742,6 @@
               if (phase !== "holding") {
                 phase = "holding";
                 holdStartedAt = performance.now();
-                reading.hidden = true;
               }
               const heldFor = performance.now() - holdStartedAt;
               palmGuide.classList.add("is-ready");
@@ -757,6 +801,14 @@
         stopCamera();
         setStatus(explainCameraError(error), "error");
       }
+    });
+
+    drawAnotherButton.addEventListener("click", () => {
+      if (phase === "spinning" || selectedCards.length >= cards.length) return;
+      drawAnotherButton.disabled = true;
+      phase = "spinning";
+      guideLabel.textContent = "Tu segunda carta está en camino";
+      spinForCard(1);
     });
 
     stopButton.addEventListener("click", () => {
