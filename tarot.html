@@ -710,6 +710,30 @@
       }, spinDuration + 150);
     }
 
+    function resetReading() {
+      if (spinTimeout) window.clearTimeout(spinTimeout);
+      spinTimeout = 0;
+      cardTrack.style.transition = "none";
+      reading.hidden = true;
+      readingResetButton.hidden = true;
+      palmGuide.style.setProperty("--hold-angle", "0deg");
+      palmGuide.style.setProperty("--hold-visible", "0");
+      palmGuide.classList.remove("is-ready");
+      guideCountdown.hidden = true;
+      guideCountdown.textContent = "";
+      guideLabel.textContent = "Coloca aquí la palma";
+      holdStartedAt = 0;
+      lastPalmX = null;
+      lastPalmY = null;
+      phase = cameraStream ? "position" : "idle";
+      prepareCards();
+      if (cameraStream) {
+        setStatus("Lectura reiniciada. Muestra la palma abierta dentro del rectángulo.");
+      } else {
+        setStatus("Lectura reiniciada. Activa la cámara para volver a elegir una carta.");
+      }
+    }
+
     function startSpin() {
       if (phase !== "countdown") return;
       phase = "spinning";
@@ -826,7 +850,7 @@
       }
     });
 
-    readingResetButton.addEventListener("click", () => window.location.reload());
+    readingResetButton.addEventListener("click", resetReading);
 
     stopButton.addEventListener("click", () => {
       stopCamera();
