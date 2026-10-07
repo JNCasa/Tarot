@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111322">
+  <meta name="description" content="Una lectura de tarot interactiva guiada por el movimiento de tu mano.">
+  <title>El Tarot Interior — Una lectura en tus manos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #111322;
+      --panel: #191b2b;
+      --panel-light: #222438;
+      --gold: #d7b875;
+      --gold-light: #f0dba7;
+      --ivory: #eee8dc;
+      --muted: #a7a6b2;
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: "DM Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--night); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 49% -10%, rgba(112, 87, 133, .28), transparent 42rem),
+        radial-gradient(ellipse at 92% 55%, rgba(55, 67, 96, .15), transparent 30rem),
+        var(--night);
+      color: var(--ivory);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font: inherit; }
+    .shell { width: min(1160px, calc(100% - 56px)); margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 27px 0;
+      border-bottom: 1px solid rgba(215, 184, 117, .16);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; color: var(--gold-light); }
+    .brand-symbol { width: 27px; height: 27px; }
+    .brand-name { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: .04em; }
+    .header-note { color: var(--muted); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    main { padding: 64px 0 72px; }
+    .intro { max-width: 670px; margin: 0 auto 43px; text-align: center; }
+    .eyebrow {
+      margin: 0 0 13px;
+      color: var(--gold);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .23em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 12px;
+      color: var(--ivory);
+      font-family: var(--serif);
+      font-size: clamp(46px, 6.5vw, 72px);
+      font-weight: 500;
+      letter-spacing: -.025em;
+      line-height: .95;
+    }
+    .intro-copy { margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+    .experience {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+      align-items: center;
+      gap: clamp(36px, 7vw, 88px);
+      max-width: 1020px;
+      margin: 0 auto;
+    }
+    .wheel-column { min-width: 0; }
+    .wheel-stage {
+      position: relative;
+      display: grid;
+      width: min(100%, 470px);
+      aspect-ratio: 1;
+      place-items: center;
+      margin: 0 auto;
+      border: 1px solid rgba(215, 184, 117, .16);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(241, 222, 172, .07) 0 1px, transparent 1.5px) 0 0 / 22px 22px,
+        radial-gradient(circle, rgba(104, 95, 129, .2), rgba(17, 19, 34, 0) 69%);
+      box-shadow: 0 0 80px rgba(107, 88, 126, .09), inset 0 0 55px rgba(6, 7, 15, .35);
+    }
+    .wheel-stage::before, .wheel-stage::after {
+      position: absolute;
+      inset: 4.5%;
+      border: 1px solid rgba(215, 184, 117, .23);
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
+    }
+    .wheel-stage::after { inset: 7.3%; border-color: rgba(215, 184, 117, .1); }
+    .wheel-pointer {
+      position: absolute;
+      z-index: 3;
+      top: 3.1%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-right: 11px solid transparent;
+      border-bottom: 24px solid var(--gold-light);
+      border-left: 11px solid transparent;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,.7));
+      transform: translateX(-50%);
+    }
+    .wheel {
+      position: relative;
+      width: 79%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 2px solid rgba(240, 219, 167, .75);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, transparent 0 24%, rgba(16, 18, 31, .4) 24.4% 25%, transparent 25.4%),
+        conic-gradient(
+          from 0deg,
+          #373047 0deg 30deg, #222a3b 30deg 60deg,
+          #383044 60deg 90deg, #202a38 90deg 120deg,
+          #3a3043 120deg 150deg, #22283a 150deg 180deg,
+          #383148 180deg 210deg, #222b3b 210deg 240deg,
+          #3b3041 240deg 270deg, #222839 270deg 300deg,
+          #392f46 300deg 330deg, #222b3a 330deg 360deg
+        );
+      box-shadow: 0 0 25px rgba(215, 184, 117, .13), inset 0 0 0 5px rgba(13, 15, 28, .78), inset 0 0 45px rgba(9, 10, 19, .42);
+      transform: rotate(0deg);
+      will-change: transform;
+    }
+    .wheel::before, .wheel::after {
+      position: absolute;
+      z-index: 1;
+      inset: 50% 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(230, 207, 154, .54) 18%, rgba(230, 207, 154, .54) 82%, transparent);
+      content: "";
+      transform: rotate(15deg);
+      transform-origin: center;
+      pointer-events: none;
+    }
+    .wheel::after { transform: rotate(45deg); }
+    .wheel-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: flex;
+      width: 53px;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      color: var(--gold-light);
+      text-align: center;
+      transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-114px) rotate(calc(-1 * var(--label-angle)));
+      transform-origin: center;
+      pointer-events: none;
+    }
+    .wheel-glyph { font-family: var(--serif); font-size: 21px; line-height: 1; }
+    .wheel-name { max-width: 57px; color: rgba(238, 232, 220, .83); font-size: 6px; font-weight: 600; letter-spacing: .065em; text-transform: uppercase; }
+    .wheel-hub {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      left: 50%;
+      display: grid;
+      width: 25%;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #3b3547, #181a2a 72%);
+      box-shadow: 0 0 0 5px rgba(215, 184, 117, .08), 0 0 25px rgba(8, 9, 16, .65);
+      color: var(--gold-light);
+      font-family: var(--serif);
+      font-size: 34px;
+      transform: translate(-50%, -50%);
+    }
+    .wheel-prompt { margin: 18px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 19px;
+    }
+    .camera-panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(215, 184, 117, .23);
+      border-radius: 6px;
+      background: #090b12;
+      aspect-ratio: 4 / 3;
+    }
+    .camera-panel video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(215, 184, 117, .09), transparent 22%),
+        linear-gradient(145deg, #202135, #111320);
+      transform: scaleX(-1);
+    }
+    .camera-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      gap: 11px;
+      color: rgba(238, 232, 220, .63);
+      text-align: center;
+      pointer-events: none;
+    }
+    .camera-placeholder[hidden] { display: none; }
+    .camera-icon { color: var(--gold); font-size: 27px; }
+    .camera-placeholder span:last-child { font-size: 10px; letter-spacing: .06em; }
+    .palm-guide {
+      position: absolute;
+      top: 17%;
+      left: 31%;
+      display: none;
+      width: 38%;
+      height: 66%;
+      place-items: center;
+      border: 1px dashed rgba(240, 219, 167, .75);
+      border-radius: 42% 42% 35% 35%;
+      background: rgba(215, 184, 117, .035);
+      box-shadow: 0 0 0 999px rgba(5, 6, 12, .12);
+      color: rgba(255,255,255,.9);
+      pointer-events: none;
+      transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .palm-guide::before {
+      position: absolute;
+      inset: -2px;
+      background: conic-gradient(var(--gold-light) var(--hold-angle, 0deg), transparent 0);
+      border-radius: inherit;
+      content: "";
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+      opacity: var(--hold-visible, 0);
+      transition: opacity .15s ease;
+    }
+    .camera-panel.is-live .palm-guide { display: grid; border-style: solid; }
+    .camera-panel.is-ready .palm-guide {
+      border-color: #8ed9b1;
+      background: rgba(104, 191, 143, .12);
+      box-shadow: 0 0 0 999px rgba(5, 6, 12, .08), 0 0 24px rgba(126, 216, 168, .25);
+    }
+    .guide-label {
+      align-self: end;
+      margin-bottom: 8px;
+      border-radius: 99px;
+      padding: 5px 8px;
+      background: rgba(10, 11, 20, .75);
+      color: rgba(255,255,255,.85);
+      font-size: 8px;
+      letter-spacing: .09em;
+      text-align: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .guide-countdown {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--gold-light);
+      font-family: var(--serif);
+      font-size: clamp(38px, 7vw, 58px);
+      text-shadow: 0 2px 18px #000;
+    }
+    .guide-countdown[hidden] { display: none; }
+    .camera-chip {
+      position: absolute;
+      top: 11px;
+      left: 11px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 99px;
+      padding: 6px 9px;
+      background: rgba(10, 11, 20, .72);
+      color: rgba(255,255,255,.85);
+      font-size: 8px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .camera-dot { width: 6px; height: 6px; border-radius: 50%; background: #7c7b86; }
+    .camera-panel.is-live .camera-dot { background: #79cf99; box-shadow: 0 0 8px #79cf99; }
+    .control-row { display: flex; flex-wrap: wrap; gap: 9px; }
+    .button {
+      display: inline-flex;
+      min-height: 45px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--gold);
+      border-radius: 3px;
+      padding: 0 17px;
+      background: var(--gold);
+      color: #201b22;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+      transition: background .2s ease, color .2s ease, transform .2s ease, opacity .2s ease;
+    }
+    .button:hover:not(:disabled) { background: var(--gold-light); transform: translateY(-1px); }
+    .button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .button:disabled { cursor: wait; opacity: .6; }
+    .button-secondary { background: transparent; color: var(--gold-light); }
+    .button-secondary:hover:not(:disabled) { background: rgba(215, 184, 117, .1); color: #fff; }
+    .button[hidden] { display: none; }
+    .status {
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      margin: 0;
+      border-left: 2px solid rgba(215, 184, 117, .58);
+      padding: 2px 0 2px 11px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.65;
+    }
+    .status[data-state="error"] { border-left-color: #d78989; color: #efb0ad; }
+    .privacy { margin: -9px 0 0; color: #81818f; font-size: 9px; line-height: 1.7; }
+    .reading {
+      overflow: hidden;
+      border: 1px solid rgba(215, 184, 117, .35);
+      border-radius: 5px;
+      background: linear-gradient(135deg, rgba(47, 40, 55, .8), rgba(25, 27, 43, .94));
+      animation: reveal .65s cubic-bezier(.2,.7,.3,1) both;
+    }
+    .reading[hidden] { display: none; }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reading-inner { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 16px; padding: 17px; }
+    .card-seal {
+      display: grid;
+      width: 68px;
+      aspect-ratio: 2 / 3;
+      place-items: center;
+      border: 1px solid var(--gold);
+      outline: 1px solid rgba(215, 184, 117, .38);
+      outline-offset: -5px;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(215,184,117,.22), transparent 42%),
+        linear-gradient(145deg, #3b3043, #171a2a);
+      color: var(--gold-light);
+      font-family: var(--serif);
+      font-size: 30px;
+    }
+    .reading-kicker { margin: 0 0 4px; color: var(--gold); font-size: 8px; font-weight: 700; letter-spacing: .17em; text-transform: uppercase; }
+    .reading h2 { margin: 0 0 5px; color: var(--ivory); font-family: var(--serif); font-size: 27px; font-weight: 500; line-height: 1; }
+    .reading-message { margin: 0; color: #c5c1c5; font-size: 10px; line-height: 1.6; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      border-top: 1px solid rgba(215, 184, 117, .14);
+      padding: 17px 0 21px;
+      color: #858592;
+      font-size: 9px;
+    }
+
+    @media (max-width: 790px) {
+      .shell { width: min(590px, calc(100% - 36px)); }
+      main { padding: 48px 0 55px; }
+      .experience { grid-template-columns: 1fr; gap: 34px; }
+      .wheel-stage { width: min(100%, 390px); }
+      .wheel-label { transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-95px) rotate(calc(-1 * var(--label-angle))); }
+      .side-panel { width: min(100%, 450px); margin: 0 auto; }
+    }
+    @media (max-width: 450px) {
+      .shell { width: calc(100% - 30px); }
+      header { padding: 20px 0; }
+      .header-note { max-width: 112px; font-size: 8px; line-height: 1.5; text-align: right; }
+      main { padding-top: 40px; }
+      .intro { margin-bottom: 34px; }
+      .intro-copy { font-size: 12px; }
+      .wheel-stage { width: min(100%, 350px); }
+      .wheel-label { transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-85px) rotate(calc(-1 * var(--label-angle))); }
+      .wheel-glyph { font-size: 19px; }
+      .wheel-name { font-size: 5px; }
+      .reading-inner { grid-template-columns: 58px 1fr; gap: 13px; padding: 14px; }
+      .card-seal { width: 56px; font-size: 26px; }
+      footer { flex-direction: column; gap: 6px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="./index.html" aria-label="Volver a Costa Serena">
+        <svg class="brand-symbol" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M16 5.5v21M5.5 16h21M8.6 8.6l14.8 14.8M23.4 8.6 8.6 23.4" stroke="currentColor" stroke-width=".8" opacity=".7"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+        </svg>
+        <span class="brand-name">El Tarot Interior</span>
+      </a>
+      <span class="header-note">Una pausa para escucharte</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Lectura interactiva · Solo para ti</p>
+        <h1 id="page-title">Deja que tu mano elija.</h1>
+        <p class="intro-copy">Concede acceso a la cámara, coloca la palma abierta dentro del marco y mantenla quieta. Después de la cuenta regresiva, la rueda girará y revelará tu carta.</p>
+      </section>
+
+      <section class="experience" aria-label="Rueda del tarot y lectura con cámara">
+        <div class="wheel-column">
+          <div class="wheel-stage">
+            <div class="wheel-pointer" aria-hidden="true"></div>
+            <div class="wheel" id="wheel" role="img" aria-label="Rueda del tarot con doce cartas">
+              <div id="wheel-labels"></div>
+              <div class="wheel-hub" aria-hidden="true">✧</div>
+            </div>
+          </div>
+          <p class="wheel-prompt">Mantén la palma abierta en el marco para elegir</p>
+        </div>
+
+        <div class="side-panel">
+          <div class="camera-panel" id="camera-panel">
+            <video id="camera" autoplay playsinline muted aria-label="Vista previa de la cámara frontal"></video>
+            <div class="camera-placeholder" id="camera-placeholder">
+              <span class="camera-icon" aria-hidden="true">✧</span>
+              <span>Tu reflejo aparecerá aquí</span>
+            </div>
+            <div class="palm-guide" id="palm-guide" aria-hidden="true">
+              <span class="guide-label" id="guide-label">Coloca aquí la palma</span>
+              <span class="guide-countdown" id="guide-countdown" hidden></span>
+            </div>
+            <div class="camera-chip"><span class="camera-dot" aria-hidden="true"></span><span id="camera-label">Cámara desactivada</span></div>
+          </div>
+
+          <div class="control-row">
+            <button class="button" id="start-camera" type="button">
+              <span aria-hidden="true">◉</span> Activar cámara frontal
+            </button>
+            <button class="button button-secondary" id="stop-camera" type="button" hidden>Apagar cámara</button>
+          </div>
+          <p class="status" id="status" role="status" aria-live="polite">La cámara permanece apagada hasta que tú decidas activarla.</p>
+          <p class="privacy">Tu imagen se procesa en este dispositivo para reconocer el movimiento de la mano. No se graba ni se envía a ningún servidor. Puedes apagar la cámara cuando quieras.</p>
+
+          <article class="reading" id="reading" aria-live="polite" hidden>
+            <div class="reading-inner">
+              <div class="card-seal" id="card-seal" aria-hidden="true">☼</div>
+              <div>
+                <p class="reading-kicker">Tu carta de hoy</p>
+                <h2 id="card-name"></h2>
+                <p class="reading-message" id="card-message"></p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>El tarot como espejo, no como destino.</span>
+      <span>Una lectura simbólica para la reflexión personal.</span>
+    </footer>
+  </div>
+
+  <script type="module">
+    const cards = [
+      { name: "El Sol", glyph: "☼", message: "Hay algo que ya está creciendo a tu favor. Date permiso para disfrutarlo y compartir tu luz." },
+      { name: "La Luna", glyph: "☾", message: "No necesitas resolverlo todo hoy. Escucha tu intuición y deja que la claridad llegue a su ritmo." },
+      { name: "La Estrella", glyph: "✧", message: "Vuelve a aquello que te inspira. Un gesto pequeño de esperanza puede abrir un horizonte nuevo." },
+      { name: "El Mago", glyph: "✴", message: "Ya tienes más recursos de los que crees. Elige una intención y conviértela en un primer paso." },
+      { name: "La Emperatriz", glyph: "❀", message: "Cuida lo que quieres ver florecer. La paciencia, el descanso y la creatividad también son acción." },
+      { name: "El Ermitaño", glyph: "♧", message: "Un poco de silencio puede ayudarte a escuchar tu propia respuesta. Busca un momento que sea solo tuyo." },
+      { name: "La Fuerza", glyph: "∞", message: "Tu sensibilidad no te hace débil. Respira, confía en tu temple y avanza con amabilidad." },
+      { name: "La Rueda", glyph: "◉", message: "Todo cambia, incluso lo que hoy parece detenido. Mantente abierto a una perspectiva diferente." },
+      { name: "El Mundo", glyph: "✺", message: "Reconoce cuánto has recorrido. Cerrar una etapa con gratitud también prepara el comienzo siguiente." },
+      { name: "La Templanza", glyph: "⚖", message: "No hace falta elegir entre extremos. Prueba a combinar paciencia y movimiento, escucha y decisión." },
+      { name: "El Loco", glyph: "☆", message: "Hay espacio para empezar sin tener todas las respuestas. Da un paso curioso, no perfecto." },
+      { name: "La Sacerdotisa", glyph: "☽", message: "Entre tanto ruido, presta atención a lo que sabes en silencio. No toda respuesta necesita explicarse." }
+    ];
+
+    const wheel = document.querySelector("#wheel");
+    const labels = document.querySelector("#wheel-labels");
+    const video = document.querySelector("#camera");
+    const cameraPanel = document.querySelector("#camera-panel");
+    const cameraPlaceholder = document.querySelector("#camera-placeholder");
+    const palmGuide = document.querySelector("#palm-guide");
+    const guideLabel = document.querySelector("#guide-label");
+    const guideCountdown = document.querySelector("#guide-countdown");
+    const cameraLabel = document.querySelector("#camera-label");
+    const startButton = document.querySelector("#start-camera");
+    const stopButton = document.querySelector("#stop-camera");
+    const status = document.querySelector("#status");
+    const reading = document.querySelector("#reading");
+    const cardName = document.querySelector("#card-name");
+    const cardMessage = document.querySelector("#card-message");
+    const cardSeal = document.querySelector("#card-seal");
+
+    let cameraStream = null;
+    let handLandmarker = null;
+    let animationFrame = 0;
+    let spinTimeout = 0;
+    let previousVideoTime = -1;
+    let wheelRotation = 0;
+    let holdStartedAt = 0;
+    let lastPalmX = null;
+    let lastPalmY = null;
+    let phase = "idle";
+
+    cards.forEach((card, index) => {
+      const label = document.createElement("span");
+      label.className = "wheel-label";
+      label.style.setProperty("--label-angle", `${index * 30 + 15}deg`);
+      label.innerHTML = `<span class="wheel-glyph">${card.glyph}</span><span class="wheel-name">${card.name}</span>`;
+      labels.append(label);
+    });
+
+    function setStatus(message, state = "info") {
+      if (status.textContent === message && status.dataset.state === state) return;
+      status.textContent = message;
+      status.dataset.state = state;
+    }
+
+    function stopCamera() {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      if (spinTimeout) window.clearTimeout(spinTimeout);
+      animationFrame = 0;
+      spinTimeout = 0;
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      video.srcObject = null;
+      cameraPanel.classList.remove("is-live");
+      cameraPlaceholder.hidden = false;
+      cameraLabel.textContent = "Cámara desactivada";
+      startButton.hidden = false;
+      startButton.disabled = false;
+      startButton.innerHTML = '<span aria-hidden="true">◉</span> Activar cámara frontal';
+      stopButton.hidden = true;
+      palmGuide.style.setProperty("--hold-angle", "0deg");
+      palmGuide.style.setProperty("--hold-visible", "0");
+      palmGuide.classList.remove("is-ready");
+      guideLabel.textContent = "Coloca aquí la palma";
+      guideCountdown.hidden = true;
+      guideCountdown.textContent = "";
+      holdStartedAt = 0;
+      lastPalmX = null;
+      lastPalmY = null;
+      phase = "idle";
+    }
+
+    function explainCameraError(error) {
+      const explanations = {
+        NotAllowedError: "No se concedió el permiso. Permite el uso de la cámara en el navegador e inténtalo de nuevo.",
+        NotFoundError: "No se encontró una cámara disponible en este dispositivo.",
+        NotReadableError: "La cámara está ocupada por otra aplicación. Ciérrala e inténtalo de nuevo.",
+        OverconstrainedError: "No se pudo abrir una cámara frontal compatible con este dispositivo.",
+        SecurityError: "El navegador bloqueó la cámara en este contexto. Abre la página desde localhost o un sitio HTTPS."
+      };
+      return explanations[error.name] || `No se pudo iniciar la cámara (${error.message || error.name}). Revisa los permisos del navegador e inténtalo de nuevo.`;
+    }
+
+    async function loadHandTracker() {
+      if (handLandmarker) return handLandmarker;
+      setStatus("Preparando el reconocimiento de manos… La primera carga puede tardar un momento.");
+      const visionVersion = "0.10.14";
+      const { FilesetResolver, HandLandmarker } = await import(
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${visionVersion}/vision_bundle.mjs`
+      );
+      const vision = await FilesetResolver.forVisionTasks(
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${visionVersion}/wasm`
+      );
+      const options = {
+        baseOptions: {
+          modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+          delegate: "GPU"
+        },
+        runningMode: "VIDEO",
+        numHands: 1
+      };
+      try {
+        handLandmarker = await HandLandmarker.createFromOptions(vision, options);
+      } catch (gpuError) {
+        handLandmarker = await HandLandmarker.createFromOptions(vision, {
+          ...options,
+          baseOptions: { ...options.baseOptions, delegate: "CPU" }
+        });
+      }
+      return handLandmarker;
+    }
+
+    function showReading(index) {
+      const card = cards[index];
+      cardName.textContent = card.name;
+      cardMessage.textContent = card.message;
+      cardSeal.textContent = card.glyph;
+      reading.hidden = false;
+      reading.style.animation = "none";
+      void reading.offsetWidth;
+      reading.style.animation = "";
+      setStatus("Tu carta está aquí. Tómate un momento para leerla.");
+    }
+
+    function isOpenPalm(hand) {
+      const wrist = hand[0];
+      const fingers = [[8, 6], [12, 10], [16, 14], [20, 18]];
+      const extendedFingers = fingers.filter(([tip, joint]) =>
+        Math.hypot(hand[tip].x - wrist.x, hand[tip].y - wrist.y) >
+        Math.hypot(hand[joint].x - wrist.x, hand[joint].y - wrist.y) * 1.16
+      ).length;
+      const thumbSpread =
+        Math.hypot(hand[4].x - hand[5].x, hand[4].y - hand[5].y) >
+        Math.hypot(hand[3].x - hand[5].x, hand[3].y - hand[5].y) * 1.12;
+      return extendedFingers >= 3 && thumbSpread;
+    }
+
+    function startSpin() {
+      if (phase !== "countdown") return;
+      phase = "spinning";
+      guideCountdown.hidden = true;
+      guideLabel.textContent = "Tu carta está en camino";
+      const selectedCard = Math.floor(Math.random() * cards.length);
+      const desiredAngle = (360 - (selectedCard * 30 + 15)) % 360;
+      const currentAngle = ((wheelRotation % 360) + 360) % 360;
+      const alignment = (desiredAngle - currentAngle + 360) % 360;
+      const finalRotation = wheelRotation + 4 * 360 + alignment;
+      wheel.style.transition = "transform 3.1s cubic-bezier(.12,.7,.17,1)";
+      wheelRotation = finalRotation;
+      wheel.style.transform = `rotate(${wheelRotation}deg)`;
+      setStatus("La rueda gira… tu carta está por aparecer.");
+      spinTimeout = window.setTimeout(() => {
+        wheel.style.transition = "none";
+        showReading(selectedCard);
+        phase = "done";
+        guideLabel.textContent = "Lectura revelada";
+        spinTimeout = 0;
+      }, 3200);
+    }
+
+    function trackHands() {
+      if (!cameraStream || !handLandmarker) return;
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.currentTime !== previousVideoTime) {
+        previousVideoTime = video.currentTime;
+        const result = handLandmarker.detectForVideo(video, performance.now());
+        const hand = result.landmarks[0];
+        if (phase === "position" || phase === "holding") {
+          if (!hand || !isOpenPalm(hand)) {
+            phase = "position";
+            holdStartedAt = 0;
+            lastPalmX = null;
+            lastPalmY = null;
+            palmGuide.style.setProperty("--hold-angle", "0deg");
+            palmGuide.style.setProperty("--hold-visible", "0");
+            palmGuide.classList.remove("is-ready");
+            guideLabel.textContent = "Coloca aquí la palma abierta";
+            setStatus(hand ? "Abre la mano, con la palma mirando hacia la cámara." : "Muestra la palma abierta dentro del marco.");
+          } else {
+            const palmX = 1 - (hand[0].x + hand[5].x + hand[9].x + hand[13].x + hand[17].x) / 5;
+            const palmY = (hand[0].y + hand[5].y + hand[9].y + hand[13].y + hand[17].y) / 5;
+            const inGuide = palmX >= .31 && palmX <= .69 && palmY >= .17 && palmY <= .83;
+            const steady = lastPalmX === null || Math.hypot(palmX - lastPalmX, palmY - lastPalmY) < .045;
+            lastPalmX = palmX;
+            lastPalmY = palmY;
+
+            if (!inGuide) {
+              phase = "position";
+              holdStartedAt = 0;
+              palmGuide.style.setProperty("--hold-angle", "0deg");
+              palmGuide.style.setProperty("--hold-visible", "0");
+              palmGuide.classList.remove("is-ready");
+              guideLabel.textContent = "Centra la palma en el marco";
+              setStatus("Acerca o aleja la mano hasta centrar la palma dentro del marco.");
+            } else if (!steady && phase === "holding") {
+              phase = "position";
+              holdStartedAt = 0;
+              palmGuide.style.setProperty("--hold-angle", "0deg");
+              palmGuide.style.setProperty("--hold-visible", "0");
+              palmGuide.classList.remove("is-ready");
+              guideLabel.textContent = "Mantén la mano quieta";
+              setStatus("Ya casi. Mantén la palma abierta y quieta dentro del marco.");
+            } else {
+              if (phase !== "holding") {
+                phase = "holding";
+                holdStartedAt = performance.now();
+                reading.hidden = true;
+              }
+              const heldFor = performance.now() - holdStartedAt;
+              palmGuide.classList.add("is-ready");
+              palmGuide.style.setProperty("--hold-angle", `${Math.min(1, heldFor / 3000) * 360}deg`);
+              palmGuide.style.setProperty("--hold-visible", "1");
+              guideLabel.textContent = "Mantén la palma quieta";
+              setStatus("Perfecto. Mantén la palma abierta en el marco durante 3 segundos.");
+              if (heldFor >= 3000) {
+                phase = "countdown";
+                lastPalmX = null;
+                lastPalmY = null;
+                guideLabel.textContent = "Prepárate para tu lectura";
+              }
+            }
+          }
+        }
+      }
+
+      if (phase === "countdown") {
+        const remaining = Math.max(0, 3 - Math.floor((performance.now() - holdStartedAt - 3000) / 1000));
+        guideCountdown.hidden = false;
+        guideCountdown.textContent = String(remaining);
+        setStatus(`Tu lectura comienza en ${remaining}…`);
+        if (remaining === 0) startSpin();
+      }
+
+      animationFrame = requestAnimationFrame(trackHands);
+    }
+
+    startButton.addEventListener("click", async () => {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus("Este navegador no permite acceder a la cámara aquí. Abre la página desde localhost o HTTPS y vuelve a intentarlo.", "error");
+        return;
+      }
+      startButton.disabled = true;
+      startButton.textContent = "Conectando…";
+      setStatus("Solicitando permiso para usar la cámara frontal…");
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        video.srcObject = cameraStream;
+        await video.play();
+        cameraPanel.classList.add("is-live");
+        cameraPlaceholder.hidden = true;
+        cameraLabel.textContent = "Cámara activa";
+        startButton.hidden = true;
+        startButton.disabled = false;
+        stopButton.hidden = false;
+        await loadHandTracker();
+        phase = "position";
+        setStatus("Muestra la palma abierta dentro del rectángulo.");
+        previousVideoTime = -1;
+        animationFrame = requestAnimationFrame(trackHands);
+      } catch (error) {
+        stopCamera();
+        setStatus(explainCameraError(error), "error");
+      }
+    });
+
+    stopButton.addEventListener("click", () => {
+      stopCamera();
+      setStatus("Cámara apagada. Tu imagen no se guardó.");
+    });
+
+    window.addEventListener("pagehide", stopCamera);
+  </script>
+</body>
+</html>
