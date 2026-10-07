@@ -78,113 +78,121 @@
       max-width: 1020px;
       margin: 0 auto;
     }
-    .wheel-column { min-width: 0; }
-    .wheel-stage {
+    .card-column { min-width: 0; }
+    .card-stage {
+      --tarot-card-width: clamp(104px, 10vw, 132px);
       position: relative;
-      display: grid;
-      width: min(100%, 470px);
-      aspect-ratio: 1;
-      place-items: center;
-      margin: 0 auto;
-      border: 1px solid rgba(215, 184, 117, .16);
-      border-radius: 50%;
+      display: flex;
+      height: clamp(250px, 29vw, 340px);
+      align-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(215, 184, 117, .18);
+      border-radius: 5px;
       background:
-        radial-gradient(circle, rgba(241, 222, 172, .07) 0 1px, transparent 1.5px) 0 0 / 22px 22px,
-        radial-gradient(circle, rgba(104, 95, 129, .2), rgba(17, 19, 34, 0) 69%);
-      box-shadow: 0 0 80px rgba(107, 88, 126, .09), inset 0 0 55px rgba(6, 7, 15, .35);
+        radial-gradient(ellipse at center, rgba(104, 95, 129, .2), transparent 66%),
+        radial-gradient(circle, rgba(241, 222, 172, .07) 0 1px, transparent 1.5px) 0 0 / 22px 22px;
+      box-shadow: inset 0 0 55px rgba(6, 7, 15, .4);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
     }
-    .wheel-stage::before, .wheel-stage::after {
+    .card-track {
+      display: flex;
+      width: max-content;
+      align-items: center;
+      gap: 14px;
+      padding: 0 20px;
+      transform: translateX(0);
+      will-change: transform;
+    }
+    .tarot-card {
+      width: var(--tarot-card-width);
+      aspect-ratio: 2 / 3;
+      flex: 0 0 var(--tarot-card-width);
+      perspective: 900px;
+      filter: drop-shadow(0 9px 13px rgba(0, 0, 0, .35));
+    }
+    .tarot-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .95s cubic-bezier(.2,.72,.18,1);
+    }
+    .tarot-card.is-revealed .tarot-card-inner { transform: rotateY(180deg); }
+    .tarot-card-face {
       position: absolute;
-      inset: 4.5%;
-      border: 1px solid rgba(215, 184, 117, .23);
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid var(--gold);
+      border-radius: 5px;
+      backface-visibility: hidden;
+      text-align: center;
+    }
+    .tarot-card-back {
+      gap: 13px;
+      outline: 1px solid rgba(215, 184, 117, .45);
+      outline-offset: -7px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(215, 184, 117, .18), transparent 48%),
+        repeating-linear-gradient(45deg, transparent 0 8px, rgba(215, 184, 117, .065) 8px 9px),
+        linear-gradient(145deg, #373047, #181a2a 70%);
+      color: var(--gold-light);
+    }
+    .tarot-card-back::before, .tarot-card-back::after {
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(215, 184, 117, .55);
       border-radius: 50%;
       content: "";
-      pointer-events: none;
     }
-    .wheel-stage::after { inset: 7.3%; border-color: rgba(215, 184, 117, .1); }
-    .wheel-pointer {
+    .tarot-card-back::after { inset: 24px 17px; border-color: rgba(215, 184, 117, .3); transform: rotate(45deg); }
+    .card-back-glyph { z-index: 1; font-family: var(--serif); font-size: 40px; }
+    .card-back-caption { z-index: 1; font-size: 7px; letter-spacing: .16em; text-transform: uppercase; }
+    .tarot-card-front {
+      gap: 9px;
+      padding: 12px;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(215,184,117,.19), transparent 39%),
+        linear-gradient(155deg, #383149, #1a1d2d 72%);
+      color: var(--gold-light);
+      transform: rotateY(180deg);
+    }
+    .tarot-card-front::before { position: absolute; inset: 7px; border: 1px solid rgba(215, 184, 117, .45); content: ""; pointer-events: none; }
+    .card-front-glyph { font-family: var(--serif); font-size: 39px; line-height: 1; }
+    .card-front-name { color: var(--ivory); font-family: var(--serif); font-size: 18px; font-weight: 600; }
+    .card-front-caption { color: var(--gold); font-size: 6px; letter-spacing: .17em; text-transform: uppercase; }
+    .tarot-card.is-selected .tarot-card-face { border-color: var(--gold-light); box-shadow: 0 0 20px rgba(240, 219, 167, .35); }
+    .selection-marker {
       position: absolute;
-      z-index: 3;
-      top: 3.1%;
+      z-index: 2;
+      top: 8%;
+      bottom: 8%;
+      left: 50%;
+      width: var(--tarot-card-width);
+      border: 1px solid rgba(240, 219, 167, .42);
+      border-radius: 5px;
+      box-shadow: 0 0 28px rgba(215, 184, 117, .12), inset 0 0 22px rgba(215, 184, 117, .06);
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+    .selection-marker::before, .selection-marker::after {
+      position: absolute;
       left: 50%;
       width: 0;
       height: 0;
-      border-right: 11px solid transparent;
-      border-bottom: 24px solid var(--gold-light);
-      border-left: 11px solid transparent;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,.7));
+      border-right: 7px solid transparent;
+      border-left: 7px solid transparent;
+      content: "";
+      filter: drop-shadow(0 0 5px rgba(240, 219, 167, .5));
       transform: translateX(-50%);
     }
-    .wheel {
-      position: relative;
-      width: 79%;
-      aspect-ratio: 1;
-      overflow: hidden;
-      border: 2px solid rgba(240, 219, 167, .75);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle, transparent 0 24%, rgba(16, 18, 31, .4) 24.4% 25%, transparent 25.4%),
-        conic-gradient(
-          from 0deg,
-          #373047 0deg 30deg, #222a3b 30deg 60deg,
-          #383044 60deg 90deg, #202a38 90deg 120deg,
-          #3a3043 120deg 150deg, #22283a 150deg 180deg,
-          #383148 180deg 210deg, #222b3b 210deg 240deg,
-          #3b3041 240deg 270deg, #222839 270deg 300deg,
-          #392f46 300deg 330deg, #222b3a 330deg 360deg
-        );
-      box-shadow: 0 0 25px rgba(215, 184, 117, .13), inset 0 0 0 5px rgba(13, 15, 28, .78), inset 0 0 45px rgba(9, 10, 19, .42);
-      transform: rotate(0deg);
-      will-change: transform;
-    }
-    .wheel::before, .wheel::after {
-      position: absolute;
-      z-index: 1;
-      inset: 50% 0 auto;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(230, 207, 154, .54) 18%, rgba(230, 207, 154, .54) 82%, transparent);
-      content: "";
-      transform: rotate(15deg);
-      transform-origin: center;
-      pointer-events: none;
-    }
-    .wheel::after { transform: rotate(45deg); }
-    .wheel-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      display: flex;
-      width: 53px;
-      flex-direction: column;
-      align-items: center;
-      gap: 1px;
-      color: var(--gold-light);
-      text-align: center;
-      transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-114px) rotate(calc(-1 * var(--label-angle)));
-      transform-origin: center;
-      pointer-events: none;
-    }
-    .wheel-glyph { font-family: var(--serif); font-size: 21px; line-height: 1; }
-    .wheel-name { max-width: 57px; color: rgba(238, 232, 220, .83); font-size: 6px; font-weight: 600; letter-spacing: .065em; text-transform: uppercase; }
-    .wheel-hub {
-      position: absolute;
-      z-index: 2;
-      top: 50%;
-      left: 50%;
-      display: grid;
-      width: 25%;
-      aspect-ratio: 1;
-      place-items: center;
-      border: 1px solid var(--gold);
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%, #3b3547, #181a2a 72%);
-      box-shadow: 0 0 0 5px rgba(215, 184, 117, .08), 0 0 25px rgba(8, 9, 16, .65);
-      color: var(--gold-light);
-      font-family: var(--serif);
-      font-size: 34px;
-      transform: translate(-50%, -50%);
-    }
-    .wheel-prompt { margin: 18px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
+    .selection-marker::before { top: -9px; border-top: 9px solid var(--gold-light); }
+    .selection-marker::after { bottom: -9px; border-bottom: 9px solid var(--gold-light); }
+    .card-prompt { margin: 18px 0 0; color: var(--muted); font-size: 11px; text-align: center; }
     .side-panel {
       display: flex;
       flex-direction: column;
@@ -379,8 +387,7 @@
       .shell { width: min(590px, calc(100% - 36px)); }
       main { padding: 48px 0 55px; }
       .experience { grid-template-columns: 1fr; gap: 34px; }
-      .wheel-stage { width: min(100%, 390px); }
-      .wheel-label { transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-95px) rotate(calc(-1 * var(--label-angle))); }
+      .card-stage { --tarot-card-width: clamp(96px, 27vw, 124px); height: 280px; }
       .side-panel { width: min(100%, 450px); margin: 0 auto; }
     }
     @media (max-width: 450px) {
@@ -390,10 +397,7 @@
       main { padding-top: 40px; }
       .intro { margin-bottom: 34px; }
       .intro-copy { font-size: 12px; }
-      .wheel-stage { width: min(100%, 350px); }
-      .wheel-label { transform: translate(-50%, -50%) rotate(var(--label-angle)) translateY(-85px) rotate(calc(-1 * var(--label-angle))); }
-      .wheel-glyph { font-size: 19px; }
-      .wheel-name { font-size: 5px; }
+      .card-stage { height: 255px; }
       .reading-inner { grid-template-columns: 58px 1fr; gap: 13px; padding: 14px; }
       .card-seal { width: 56px; font-size: 26px; }
       footer { flex-direction: column; gap: 6px; }
@@ -421,19 +425,16 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">Lectura interactiva · Solo para ti</p>
         <h1 id="page-title">Deja que tu mano elija.</h1>
-        <p class="intro-copy">Concede acceso a la cámara, coloca la palma abierta dentro del marco y mantenla quieta. Después de la cuenta regresiva, la rueda girará y revelará tu carta.</p>
+        <p class="intro-copy">Concede acceso a la cámara, coloca la palma abierta dentro del marco y mantenla quieta. Después de la cuenta regresiva, las cartas pasarán frente a ti y una se dará vuelta para revelar tu mensaje.</p>
       </section>
 
-      <section class="experience" aria-label="Rueda del tarot y lectura con cámara">
-        <div class="wheel-column">
-          <div class="wheel-stage">
-            <div class="wheel-pointer" aria-hidden="true"></div>
-            <div class="wheel" id="wheel" role="img" aria-label="Rueda del tarot con doce cartas">
-              <div id="wheel-labels"></div>
-              <div class="wheel-hub" aria-hidden="true">✧</div>
-            </div>
+      <section class="experience" aria-label="Cartas del tarot y lectura con cámara">
+        <div class="card-column">
+          <div class="card-stage" id="card-stage" role="img" aria-label="Cartas del tarot desplazándose horizontalmente">
+            <div class="card-track" id="card-track"></div>
+            <div class="selection-marker" aria-hidden="true"></div>
           </div>
-          <p class="wheel-prompt">Mantén la palma abierta en el marco para elegir</p>
+          <p class="card-prompt">Mantén la palma abierta y deja que las cartas elijan</p>
         </div>
 
         <div class="side-panel">
@@ -498,8 +499,8 @@
       { name: "La Sacerdotisa", glyph: "☽", message: "Entre tanto ruido, presta atención a lo que sabes en silencio. No toda respuesta necesita explicarse." }
     ];
 
-    const wheel = document.querySelector("#wheel");
-    const labels = document.querySelector("#wheel-labels");
+    const cardStage = document.querySelector("#card-stage");
+    const cardTrack = document.querySelector("#card-track");
     const video = document.querySelector("#camera");
     const cameraPanel = document.querySelector("#camera-panel");
     const cameraPlaceholder = document.querySelector("#camera-placeholder");
@@ -521,19 +522,67 @@
     let animationFrame = 0;
     let spinTimeout = 0;
     let previousVideoTime = -1;
-    let wheelRotation = 0;
+    let centeredCardIndex = 2;
     let holdStartedAt = 0;
     let lastPalmX = null;
     let lastPalmY = null;
     let phase = "idle";
 
-    cards.forEach((card, index) => {
-      const label = document.createElement("span");
-      label.className = "wheel-label";
-      label.style.setProperty("--label-angle", `${index * 30 + 15}deg`);
-      label.innerHTML = `<span class="wheel-glyph">${card.glyph}</span><span class="wheel-name">${card.name}</span>`;
-      labels.append(label);
-    });
+    function createCard(card) {
+      const element = document.createElement("div");
+      element.className = "tarot-card";
+      element.setAttribute("aria-hidden", "true");
+      const inner = document.createElement("div");
+      inner.className = "tarot-card-inner";
+      const back = document.createElement("div");
+      back.className = "tarot-card-face tarot-card-back";
+      back.innerHTML = '<span class="card-back-glyph">✧</span><span class="card-back-caption">El Tarot Interior</span>';
+      const front = document.createElement("div");
+      front.className = "tarot-card-face tarot-card-front";
+      const glyph = document.createElement("span");
+      glyph.className = "card-front-glyph";
+      glyph.textContent = card.glyph;
+      const name = document.createElement("span");
+      name.className = "card-front-name";
+      name.textContent = card.name;
+      const caption = document.createElement("span");
+      caption.className = "card-front-caption";
+      caption.textContent = "Tu carta";
+      front.append(glyph, name, caption);
+      inner.append(back, front);
+      element.append(inner);
+      return element;
+    }
+
+    function centerCard(index) {
+      const selected = cardTrack.children[index];
+      if (!selected) return;
+      const offset = selected.offsetLeft + selected.offsetWidth / 2 - cardStage.clientWidth / 2;
+      cardTrack.style.transform = `translateX(${-offset}px)`;
+      centeredCardIndex = index;
+    }
+
+    function prepareCards(selectedIndex = null) {
+      cardTrack.replaceChildren();
+      const initialIndex = 2;
+      const targetIndex = 22;
+      for (let index = 0; index < 25; index++) {
+        const cardIndex = index === targetIndex && selectedIndex !== null
+          ? selectedIndex
+          : Math.floor(Math.random() * cards.length);
+        const cardElement = createCard(cards[cardIndex]);
+        if (index === targetIndex && selectedIndex !== null) cardElement.classList.add("is-selected");
+        cardTrack.append(cardElement);
+      }
+      cardTrack.style.transition = "none";
+      centerCard(initialIndex);
+      return targetIndex;
+    }
+
+    prepareCards();
+    window.addEventListener("resize", () => {
+      if (phase !== "spinning") centerCard(centeredCardIndex);
+    }, { passive: true });
 
     function setStatus(message, state = "info") {
       if (status.textContent === message && status.dataset.state === state) return;
@@ -558,8 +607,6 @@
       startButton.disabled = false;
       startButton.innerHTML = '<span aria-hidden="true">◉</span> Activar cámara frontal';
       stopButton.hidden = true;
-      drawAnotherButton.hidden = true;
-      drawAnotherButton.disabled = false;
       palmGuide.style.setProperty("--hold-angle", "0deg");
       palmGuide.style.setProperty("--hold-visible", "0");
       palmGuide.classList.remove("is-ready");
@@ -640,21 +687,27 @@
 
     function spinForCard() {
       const selectedCard = Math.floor(Math.random() * cards.length);
-      const desiredAngle = (360 - (selectedCard * 30 + 15)) % 360;
-      const currentAngle = ((wheelRotation % 360) + 360) % 360;
-      const alignment = (desiredAngle - currentAngle + 360) % 360;
-      const finalRotation = wheelRotation + 4 * 360 + alignment;
-      wheel.style.transition = "transform 3.1s cubic-bezier(.12,.7,.17,1)";
-      wheelRotation = finalRotation;
-      wheel.style.transform = `rotate(${wheelRotation}deg)`;
-      setStatus("La rueda gira… tu carta está por aparecer.");
+      const targetIndex = prepareCards(selectedCard);
+      const targetCard = cardTrack.children[targetIndex];
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const spinDuration = reducedMotion ? 100 : 4300;
+      cardTrack.offsetWidth;
+      window.requestAnimationFrame(() => {
+        cardTrack.style.transition = `transform ${spinDuration}ms cubic-bezier(.12,.7,.17,1)`;
+        centerCard(targetIndex);
+      });
+      setStatus("Las cartas pasan frente a ti… una está a punto de detenerse.");
       spinTimeout = window.setTimeout(() => {
-        wheel.style.transition = "none";
-        showReading(selectedCard);
-        phase = "done";
-        guideLabel.textContent = "Lectura revelada";
-        spinTimeout = 0;
-      }, 3200);
+        targetCard.classList.add("is-selected", "is-revealed");
+        setStatus("La carta elegida se da vuelta…");
+        spinTimeout = window.setTimeout(() => {
+          centerCard(targetIndex);
+          showReading(selectedCard);
+          phase = "done";
+          guideLabel.textContent = "Lectura revelada";
+          spinTimeout = 0;
+        }, reducedMotion ? 100 : 1050);
+      }, spinDuration + 150);
     }
 
     function startSpin() {
